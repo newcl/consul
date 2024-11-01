@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-http-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-http-server
+  template:
+    metadata:
+      labels:
+        app: go-http-server
+    spec:
+      containers:
+      - name: go-http-server
+        image: newcl/go-http-server:latest
+        ports:
+        - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-http-service
+  annotations:
+    "consul.hashicorp.com/service-sync": "true"
+spec:
+  selector:
+    app: go-http-server
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: NodePort
